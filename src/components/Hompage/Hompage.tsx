@@ -3,33 +3,8 @@ import { DarkModeContext } from "../hook/DarkModeContext";
 import { Box } from "@mui/material";
 import CardView from "./CardView/CardView";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import Test from "./CardView/Test";
 
-const GET_ALL_PROFILES = gql`
-  query GetAllProfiles(
-    $orderBy: globalOrderBy
-    $searchString: String
-    $rows: Int
-    $page: Int
-  ) {
-    getAllProfiles(
-      orderBy: $orderBy
-      searchString: $searchString
-      rows: $rows
-      page: $page
-    ) {
-      size
-      profiles {
-        id
-        first_name
-        last_name
-        email
-        is_verified
-        image_url
-        description
-      }
-    }
-  }
-`;
 interface Profile {
   id: string;
   first_name: string;
@@ -45,7 +20,7 @@ const Homepage = () => {
 
   return (
     <Box>
-      <CardView />
+      {/* <CardView /> */} <Test />
     </Box>
   );
 };
