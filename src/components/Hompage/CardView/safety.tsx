@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useQuery } from "@apollo/client";
-import { Card, CardContent, Grid, Input, Typography } from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import { GET_ALL_PROFILES } from "../../queries/getAllProfiles";
-import debounce from "lodash/debounce";
 
 type Profile = {
   id: string;
@@ -15,23 +14,22 @@ type Profile = {
 };
 
 const Test = () => {
+  // search String Code
   const [searchString, setSearchString] = useState("");
+
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [doneLoad, setDoneLoad] = useState(0);
-  const [shouldReload, setShouldReload] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 16;
   const containerRef = useRef<HTMLDivElement>(null);
   const loadingMoreRef = useRef(false);
+  const [totalProfiles, setTotalProfiles] = useState<number>(0);
 
   const { loading, error, data } = useQuery(GET_ALL_PROFILES, {
     variables: {
       page: currentPage,
       rows: pageSize,
-      searchString: searchString,
     },
-    fetchPolicy: "cache-and-network",
   });
 
   useEffect(() => {
@@ -40,10 +38,12 @@ const Test = () => {
       console.log("Total Profiles: " + data.getAllProfiles.size);
 
       setProfiles((prevProfiles) => [...prevProfiles, ...newProfiles]);
+      setTotalProfiles(data.getAllProfiles.total);
       setDoneLoad((prevDoneLoad) => prevDoneLoad + newProfiles.length);
       loadingMoreRef.current = false;
     }
-  }, [data, setShouldReload]);
+  }, [data]);
+  console.log(doneLoad);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -92,73 +92,49 @@ const Test = () => {
   }, []);
 
   useEffect(() => {
+    // Reset loadingMoreRef when loading changes to false
     if (!loading) {
       loadingMoreRef.current = false;
     }
   }, [loading]);
 
-  useEffect(() => {
-    setProfiles([]);
-    setDoneLoad(0);
-    setCurrentPage(0);
-    loadingMoreRef.current = false;
-  }, [searchString]);
+  const filteredProfiles = useMemo(() => {
+    const uniqueProfiles = new Map<string, Profile>();
+    profiles.forEach((profile) => {
+      uniqueProfiles.set(profile.id, profile);
+    });
 
-  const debouncedSearch = useRef(
-    debounce((value: string) => {
-      setSearchString(value);
-      if (value === "") {
-        setShouldReload(true);
-      } else setShouldReload(false);
-    }, 700)
-  ).current;
-  useEffect(() => {
-    if (shouldReload) {
-      window.location.reload();
-    }
-  }, [shouldReload]);
+    return Array.from(uniqueProfiles.values());
+  }, [profiles]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchInput(value);
-    debouncedSearch(value);
-
-    // Set the flag to reload the page if input is empty
-  };
+  if (loading && !profiles.length) {
+    return <p>Loading...</p>;
+  }
 
   if (error) {
     return <p>Error: {error.message}</p>;
   }
+
+  const renderMoreProfiles = filteredProfiles.length !== doneLoad;
+  console.log(filteredProfiles);
   return (
     <div>
-      <Input
-        type="text"
-        style={{ visibility: loading ? "visible" : "visible" }}
-        value={searchInput}
-        onChange={handleInputChange}
-        autoFocus // Automatically focus on the input field
-        placeholder="Search Profiles"
-      />
-
-      {loading && !profiles.length ? (
-        <p>Loading...</p>
-      ) : (
-        <div ref={containerRef}>
-          <Grid container spacing={2}>
-            {profiles.map((profile) => (
-              <Grid item xs={4} key={profile.id}>
-                <Card sx={{ width: "300px", height: "500px" }}>
-                  <CardContent>
-                    <Typography>{profile.id}</Typography>
-                    <Typography variant="h6">{profile.first_name}</Typography>
-                    {/* Render other profile details */}
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </div>
-      )}
+      <div ref={containerRef}>
+        <Grid container spacing={2}>
+          {filteredProfiles.map((profile, index) => (
+            <Grid item xs={4} key={profile.id}>
+              <Card sx={{ width: "300px ", height: "500px" }}>
+                <CardContent>
+                  <Typography>{profile.id}</Typography>
+                  <Typography variant="h6">{profile.first_name}</Typography>
+                  {/* Render other profile details */}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+        {renderMoreProfiles && <p>Loading more profiles...</p>}
+      </div>
     </div>
   );
 };

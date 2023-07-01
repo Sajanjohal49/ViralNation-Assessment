@@ -20,7 +20,8 @@ const Homepage = () => {
 
   return (
     <Box>
-      {/* <CardView /> */} <Test />
+      {/* <CardView /> */}
+      <Test />
     </Box>
   );
 };

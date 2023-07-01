@@ -92,7 +92,6 @@ const CardView: React.FC<CardViewProps> = () => {
 
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalProfiles, setTotalProfiles] = useState<number>(0);
   const [rows, setRows] = useState(16);
 
   const [fetchProfiles, { data, loading: queryLoading, error }] = useLazyQuery(
@@ -102,8 +101,8 @@ const CardView: React.FC<CardViewProps> = () => {
         const { size, profiles: fetchedProfiles } = data.getAllProfiles;
         setRows(size);
         setPage((prevPage) => prevPage + 1);
-        setProfiles(fetchedProfiles);
-        setHasMoreProfiles(fetchProfiles.length <= size);
+        setProfiles((prevProfiles) => [...prevProfiles, ...fetchedProfiles]);
+        setHasMoreProfiles(fetchedProfiles.length >= size);
       },
     }
   );
@@ -122,10 +121,6 @@ const CardView: React.FC<CardViewProps> = () => {
 
       fetchProfiles({
         variables: {
-          orderBy: {
-            key: "is_verified",
-            sort: "asc",
-          },
           searchString,
         },
       });
@@ -144,23 +139,42 @@ const CardView: React.FC<CardViewProps> = () => {
       variables: {
         orderBy: {
           key: "is_verified",
-          sort: "asc",
+          sort: "desc",
         },
         rows,
-        page,
+
+        searchString,
       },
     });
   };
+
   useEffect(() => {
-    if (data) {
-      const { size, profiles: fetchedProfiles } = data.getAllProfiles;
-      setTotalProfiles(size);
-      setRows(size);
-      setProfiles((prevProfiles) => [...prevProfiles, ...fetchedProfiles]);
-      setPage((prevPage) => prevPage + 1);
-      setHasMoreProfiles(fetchedProfiles.length <= size);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreProfiles) {
+          handleLoadMore();
+          setRows(profiles.length);
+        }
+      },
+      { threshold: 1 }
+    );
+
+    if (targetRef.current) {
+      observer.observe(targetRef.current);
     }
-  }, [data, totalProfiles]);
+
+    return () => {
+      if (targetRef.current) {
+        observer.unobserve(targetRef.current);
+      }
+    };
+  }, [hasMoreProfiles, handleLoadMore, page, rows]);
+  useEffect(() => {
+    if (profiles.length === data?.getAllProfiles.size) {
+      setHasMoreProfiles(false);
+    }
+  }, [profiles, data?.getAllProfiles.size]);
+
   const cardBackground = darkMode ? "#000000" : grey[200];
 
   return (
@@ -216,28 +230,126 @@ const CardView: React.FC<CardViewProps> = () => {
         </Grid>
       </Grid>
       <Box>
-        <InfiniteScroll
-          dataLength={rows}
-          next={handleLoadMore}
-          hasMore={hasMoreProfiles}
-          loader={<p></p>}
-          endMessage={
-            <Typography variant="body2" sx={{ textAlign: "center" }}>
-              You have reached the end!
-            </Typography>
-          }>
-          <Grid
-            ref={targetRef}
-            container
-            sx={{
-              boxShadow: "none",
-              maxWidth: "1300px",
-              marginLeft: "auto",
-              padding: "20px",
-              marginRight: "auto",
-              marginTop: `${isSmallScreen ? "0px" : "50px"}`,
-            }}></Grid>
-        </InfiniteScroll>
+        <Grid
+          container
+          sx={{
+            boxShadow: "none",
+            maxWidth: "1300px",
+            marginLeft: "auto",
+            padding: "20px",
+            marginRight: "auto",
+            marginTop: `${isSmallScreen ? "0px" : "50px"}`,
+          }}>
+          {profiles.map((profile, index) => (
+            <Grid
+              item
+              key={`${profile.id}-${index}`}
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
+              zeroMinWidth
+              padding={1}>
+              <Card
+                sx={{
+                  borderRadius: "10px",
+                  padding: 1,
+
+                  backgroundColor: cardBackground,
+                  boxShadow: "none",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      paddingBottom: 2,
+                    }}>
+                    <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+                      <Box>
+                        <Item
+                          sx={{
+                            mx: "auto",
+                          }}>
+                          <Stack
+                            spacing={2}
+                            direction="row"
+                            alignItems="center">
+                            <Avatar
+                              alt={profile.image_url}
+                              src={profile.image_url}
+                              sx={{ width: 56, height: 56 }}
+                            />
+
+                            <Typography
+                              noWrap
+                              sx={{
+                                color: grey[900],
+                                display: "flex",
+
+                                flexDirection: "column",
+                              }}>
+                              <Typography
+                                noWrap
+                                variant="subtitle2"
+                                sx={{
+                                  color: grey[900],
+                                  textAlign: "left",
+                                }}>
+                                {profile.first_name} {profile.last_name}
+                                <VerifiedIcon
+                                  sx={{
+                                    color: blue[500],
+                                    width: 20,
+                                    height: 20,
+                                    verticalAlign: "middle",
+                                  }}
+                                />
+                              </Typography>
+                              <Typography
+                                noWrap
+                                variant="caption"
+                                sx={{
+                                  textAlign: "left",
+                                  color: grey[800],
+                                }}>
+                                {profile.email}
+                              </Typography>
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "flex-end",
+                              }}>
+                              <Actions profileId={profile.id} />
+                            </Box>
+                          </Stack>
+                        </Item>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <CustomBox>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: "0.7rem",
+                        lineHeight: "14px",
+                        color: grey[700],
+                      }}>
+                      {profile.description}
+                    </Typography>
+                  </CustomBox>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+          {queryLoading && <CircularProgress sx={{ margin: " 40px auto" }} />}
+          <div ref={targetRef} />
+        </Grid>
       </Box>
     </Box>
   );

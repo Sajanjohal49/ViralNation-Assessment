@@ -18,8 +18,6 @@ const Test = () => {
   const [searchString, setSearchString] = useState("");
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [doneLoad, setDoneLoad] = useState(0);
-  const [shouldReload, setShouldReload] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 16;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,7 +41,7 @@ const Test = () => {
       setDoneLoad((prevDoneLoad) => prevDoneLoad + newProfiles.length);
       loadingMoreRef.current = false;
     }
-  }, [data, setShouldReload]);
+  }, [data]);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -107,58 +105,42 @@ const Test = () => {
   const debouncedSearch = useRef(
     debounce((value: string) => {
       setSearchString(value);
-      if (value === "") {
-        setShouldReload(true);
-      } else setShouldReload(false);
-    }, 700)
+    }, 500)
   ).current;
-  useEffect(() => {
-    if (shouldReload) {
-      window.location.reload();
-    }
-  }, [shouldReload]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchInput(value);
-    debouncedSearch(value);
+  const performSearch = (searchValue: string) => {};
 
-    // Set the flag to reload the page if input is empty
-  };
+  if (loading && !profiles.length) {
+    return <p>Loading...</p>;
+  }
 
   if (error) {
     return <p>Error: {error.message}</p>;
   }
+
   return (
     <div>
       <Input
         type="text"
-        style={{ visibility: loading ? "visible" : "visible" }}
-        value={searchInput}
-        onChange={handleInputChange}
-        autoFocus // Automatically focus on the input field
+        value={searchString}
+        onChange={(e) => debouncedSearch(e.target.value)}
         placeholder="Search Profiles"
       />
-
-      {loading && !profiles.length ? (
-        <p>Loading...</p>
-      ) : (
-        <div ref={containerRef}>
-          <Grid container spacing={2}>
-            {profiles.map((profile) => (
-              <Grid item xs={4} key={profile.id}>
-                <Card sx={{ width: "300px", height: "500px" }}>
-                  <CardContent>
-                    <Typography>{profile.id}</Typography>
-                    <Typography variant="h6">{profile.first_name}</Typography>
-                    {/* Render other profile details */}
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </div>
-      )}
+      <div ref={containerRef}>
+        <Grid container spacing={2}>
+          {profiles.map((profile) => (
+            <Grid item xs={4} key={profile.id}>
+              <Card sx={{ width: "300px", height: "500px" }}>
+                <CardContent>
+                  <Typography>{profile.id}</Typography>
+                  <Typography variant="h6">{profile.first_name}</Typography>
+                  {/* Render other profile details */}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </div>
     </div>
   );
 };
