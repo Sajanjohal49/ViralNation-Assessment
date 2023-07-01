@@ -4,6 +4,7 @@ import {
   Fade,
   Modal,
   Typography,
+  alpha,
   unstable_createMuiStrictModeTheme,
   useMediaQuery,
 } from "@mui/material";
@@ -114,7 +115,10 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
               sx={{
                 textTransform: "none",
                 width: "100%",
-                bgcolor: red[700],
+                bgcolor: {
+                  main: red[700],
+                  "&:hover": alpha(red[700], 0.8), // Adjust the opacity to make it lighter on hover
+                },
                 color: grey[200],
                 margin: " 0 30px",
               }}>

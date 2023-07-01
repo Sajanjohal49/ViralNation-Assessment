@@ -1,25 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Input,
-  TextField,
-  Typography,
-  createTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { Card, CardContent, Grid, Input, Typography } from "@mui/material";
 import { GET_ALL_PROFILES } from "../../queries/getAllProfiles";
 import debounce from "lodash/debounce";
-import styled from "@emotion/styled";
-import ProfileGridItem from "./ProfileGridItem";
-
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import CreateProfile from "../CreateProfile/CreateProfile";
-import SearchAndCreateProfile from "./SearchAndCreateProfile";
 
 type Profile = {
   id: string;
@@ -38,19 +21,9 @@ const Test = () => {
   const [shouldReload, setShouldReload] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const [open, setOpen] = useState(false);
   const pageSize = 16;
   const containerRef = useRef<HTMLDivElement>(null);
   const loadingMoreRef = useRef(false);
-  const muiTheme = createTheme();
-  const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const { loading, error, data } = useQuery(GET_ALL_PROFILES, {
     variables: {
@@ -157,31 +130,36 @@ const Test = () => {
     return <p>Error: {error.message}</p>;
   }
   return (
-    <Box sx={{ maxWidth: "1300px", margin: "30px auto" }}>
-      <SearchAndCreateProfile
-        searchInput={searchInput}
-        handleInputChange={handleInputChange}
-        handleOpen={handleOpen}
-        open={open}
-        handleClose={handleClose}
+    <div>
+      <Input
+        type="text"
+        style={{ visibility: loading ? "visible" : "visible" }}
+        value={searchInput}
+        onChange={handleInputChange}
+        autoFocus // Automatically focus on the input field
+        placeholder="Search Profiles"
       />
 
       {loading && !profiles.length ? (
         <p>Loading...</p>
       ) : (
         <div ref={containerRef}>
-          <Grid
-            container
-            sx={{
-              boxShadow: "none",
-            }}>
+          <Grid container spacing={2}>
             {profiles.map((profile) => (
-              <ProfileGridItem key={profile.id} profile={profile} />
+              <Grid item xs={4} key={profile.id}>
+                <Card sx={{ width: "300px", height: "500px" }}>
+                  <CardContent>
+                    <Typography>{profile.id}</Typography>
+                    <Typography variant="h6">{profile.first_name}</Typography>
+                    {/* Render other profile details */}
+                  </CardContent>
+                </Card>
+              </Grid>
             ))}
           </Grid>
         </div>
       )}
-    </Box>
+    </div>
   );
 };
 

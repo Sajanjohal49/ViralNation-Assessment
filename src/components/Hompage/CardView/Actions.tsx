@@ -7,6 +7,7 @@ import { profile } from "console";
 import { gql, useLazyQuery } from "@apollo/client";
 import EditProfile from "../EditProfile/EditProfile";
 import DeleteProfile from "../DeleteProfile/DeleteProfile";
+import { Box } from "@mui/material";
 
 type Profile = {
   id: string;
@@ -69,12 +70,14 @@ const Actions: React.FunctionComponent<IActionsProps> = ({ profileId }) => {
         open={openMenu}
         onClose={handleCloseMenu}>
         <MenuItem
+          sx={{ fontSize: "15px" }}
           onClick={() => {
             handleEdit(profileId);
           }}>
           Edit
         </MenuItem>
         <MenuItem
+          sx={{ fontSize: "15px" }}
           onClick={() => {
             handleDelete(profileId);
           }}>

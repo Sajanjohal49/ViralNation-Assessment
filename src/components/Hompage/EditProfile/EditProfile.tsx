@@ -196,6 +196,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         <InputLabel>First name</InputLabel>
                         <TextField
                           name="first_name"
+                          size="small"
                           fullWidth
                           value={formData.first_name || ""}
                           onChange={handleChange}
@@ -205,6 +206,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         <InputLabel>Last name</InputLabel>
                         <TextField
                           name="last_name"
+                          size="small"
                           fullWidth
                           value={formData.last_name || ""}
                           onChange={handleChange}
@@ -214,6 +216,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         <InputLabel>Email</InputLabel>
                         <TextField
                           name="email"
+                          size="small"
                           fullWidth
                           value={formData.email || ""}
                           onChange={handleChange}
@@ -223,6 +226,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         <InputLabel>Description</InputLabel>
                         <TextField
                           name="description"
+                          size="small"
                           fullWidth
                           value={formData.description || ""}
                           onChange={handleChange}
@@ -235,7 +239,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                             display: "flex",
                             justifyContent: "space-between",
                             color: grey[700],
-                            padding: "13px 10px",
+                            padding: "7px 10px",
                             bgcolor: grey[300],
                             borderRadius: "4px",
                           }}>
@@ -248,7 +252,8 @@ const EditProfile: React.FC<EditProfileProps> = ({
                             Talent is verified
                           </Typography>
                           <Switch
-                            checked={formData.is_verified || false}
+                            checked={formData.is_verified}
+                            defaultChecked={formData.is_verified}
                             onChange={handleSwitchChange}
                             inputProps={{ "aria-label": "controlled" }}
                           />
