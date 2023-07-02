@@ -4,40 +4,23 @@ import { createTheme, Theme, ThemeProvider } from "@mui/material/styles";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { grey } from "@mui/material/colors";
-import { DarkModeContext } from "../hook/DarkModeContext";
+import { ColorModeContext } from "../hook/DarkModeContext";
 import { Link } from "react-router-dom";
+import { useTheme } from "@emotion/react";
 
 export const Navbar: React.FC = () => {
-  const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
-  const darkModeColor = {
-    color: darkMode ? grey[300] : grey[500],
-  };
-  const lightModeColor = {
-    color: darkMode ? grey[300] : grey[800],
-  };
-  const theme: Theme = createTheme({
-    palette: {
-      mode: darkMode ? "dark" : "light",
-      primary: {
-        main: darkMode ? "#000000" : "#ffffff",
-      },
-      background: {
-        default: darkMode ? "#000000" : "#ffffff",
-      },
-    },
-    breakpoints: {
-      values: {
-        xs: 0,
-        sm: 600,
-        md: 960,
-        lg: 1280,
-        xl: 1920,
-      },
-    },
-  });
+  const theme = useTheme();
+  const colorMode = React.useContext(ColorModeContext);
+
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position="static" sx={{ boxShadow: "none" }}>
+      <AppBar
+        position="static"
+        sx={{
+          bgcolor: "action.disabledBackground",
+
+          color: "text.primary",
+        }}>
         <Toolbar>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
             <Box
@@ -65,13 +48,10 @@ export const Navbar: React.FC = () => {
               justifyItems: "center",
               alignItems: "center",
             }}>
-            <LightModeIcon sx={lightModeColor} />
-            <Switch
-              checked={darkMode}
-              onChange={toggleDarkMode}
-              color="default"
-            />
-            <DarkModeIcon sx={darkModeColor} />
+            <LightModeIcon fontSize="small" />
+
+            <Switch color="default" onClick={colorMode.toggleColorMode} />
+            <DarkModeIcon fontSize="small" />
           </div>
         </Toolbar>
       </AppBar>

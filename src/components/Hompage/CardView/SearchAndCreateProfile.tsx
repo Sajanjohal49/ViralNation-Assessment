@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import CreateProfile from "../CreateProfile/CreateProfile";
+import { useTheme } from "@emotion/react";
 
 type SearchAndCreateProfileProps = {
   searchInput: string;
@@ -24,20 +25,29 @@ const SearchAndCreateProfile: React.FC<SearchAndCreateProfileProps> = ({
   open,
   handleClose,
 }) => {
+  const theme = useTheme();
+
+  // Use the theme object to determine the border color
+
   const muiTheme = createTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
 
   return (
     <Box
       sx={{
-        padding: "20px 0",
+        bgcolor: "background.default",
+
+        color: "text.primary",
+        padding: isSmallScreen ? "20px 30px" : "50px 0px",
         display: isSmallScreen ? "relative" : "flex",
       }}>
       <TextField
         type="text"
         size="small"
         fullWidth
-        sx={{ padding: isSmallScreen ? "0px" : "10px" }}
+        sx={{
+          padding: isSmallScreen ? "0px" : "10px",
+        }}
         value={searchInput}
         onChange={handleInputChange}
         placeholder="Search Profiles"
@@ -49,10 +59,12 @@ const SearchAndCreateProfile: React.FC<SearchAndCreateProfileProps> = ({
           justifyContent: "flex-end",
         }}>
         <Button
+          color="primary"
           variant="outlined"
           sx={{
             display: "flex",
             alignItems: "center",
+
             textTransform: "none",
             minWidth: "10rem",
             padding: "7px",

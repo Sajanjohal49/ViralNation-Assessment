@@ -63,9 +63,10 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
             position: "fixed",
             top: "50%",
             left: "50%",
-            bgcolor: "#fff",
+            bgcolor: "background.default",
+            color: "text.primary",
             transform: "translate(-50%, -50%)",
-            width: isSmallScreen ? "70%" : "400px",
+            width: isSmallScreen ? "70%" : "500px",
             maxHeight: isSmallScreen ? "100%" : "400px",
 
             outline: "none",
@@ -81,7 +82,7 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
               height: "30px",
 
               borderBottom: "1px solid lightgrey",
-              color: grey[800],
+              color: "text.primary",
             }}>
             <Typography variant="h6">Remove Profile</Typography>
             <CloseIcon onClick={handleClose} />
@@ -104,23 +105,21 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
               sx={{
                 textTransform: "none",
                 width: "100%",
-                bgcolor: grey[300],
-                color: grey[900],
-                margin: " 0 30px",
+                color: "text.primary",
+                bgcolor: "text.disabled",
+                margin: " 0 20px",
               }}>
               Cancel
             </Button>
             <Button
+              variant="contained"
               onClick={handleDelete}
+              color="error"
               sx={{
                 textTransform: "none",
                 width: "100%",
-                bgcolor: {
-                  main: red[700],
-                  "&:hover": alpha(red[700], 0.8), // Adjust the opacity to make it lighter on hover
-                },
-                color: grey[200],
-                margin: " 0 30px",
+
+                margin: " 0 20px",
               }}>
               Delete
             </Button>

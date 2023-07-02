@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { DarkModeContext } from "../hook/DarkModeContext";
 import { Box } from "@mui/material";
 import CardView from "./CardView/CardView";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
@@ -19,7 +18,14 @@ const Homepage = () => {
   // Type annotation for profiles array
 
   return (
-    <Box>
+    <Box
+      minHeight="100vh"
+      sx={{
+        bgcolor: "background.default",
+        height: "100%",
+
+        color: "text.primary",
+      }}>
       {/* <CardView /> */}
       <Test />
     </Box>

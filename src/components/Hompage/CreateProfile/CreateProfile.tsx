@@ -11,6 +11,7 @@ import {
   Input,
   InputLabel,
   Modal,
+  Paper,
   Switch,
   TextField,
   Typography,
@@ -93,6 +94,7 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
 
     try {
       const response = await createProfile({ variables });
+      window.location.reload();
       console.log("Profile created:", response.data.createProfile);
       handleClose(); // Close the modal after successful profile creation
     } catch (error) {
@@ -104,18 +106,20 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
       <Fade in={open}>
         {/* Add your modal content here */}
         {/* For example: */}
-        <Box
+        <Paper
           sx={{
             display: "relative",
             position: "fixed",
             top: "50%",
             left: "50%",
-            bgcolor: "#fff",
+
             transform: "translate(-50%, -50%)",
             width: isSmallScreen ? "100%" : "60vw",
-            height: isSmallScreen ? "100%" : "90%",
+            height: isSmallScreen ? "100%" : "95%",
 
             outline: "none",
+            color: "text.primary",
+            bgcolor: "background.default",
 
             boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
           }}>
@@ -128,7 +132,6 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
               height: "30px",
 
               borderBottom: "1px solid lightgrey",
-              color: grey[800],
             }}>
             <Typography variant="h6">Create Profile</Typography>
             <IconButton onClick={handleClose}>
@@ -216,9 +219,9 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         sx={{
                           display: "flex",
                           justifyContent: "space-between",
-                          color: grey[700],
+                          color: "text.primary",
                           padding: "7px 10px",
-                          bgcolor: grey[300],
+                          bgcolor: "divider",
                           borderRadius: "4px",
                         }}>
                         <Typography
@@ -232,7 +235,7 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         </Typography>
                         <Switch
                           checked={checked}
-                          onChange={handleChange}
+                          onChange={handleSwitch}
                           inputProps={{ "aria-label": "controlled" }}
                         />
                       </Box>
@@ -259,7 +262,7 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
               </Box>
             </form>
           </Box>
-        </Box>
+        </Paper>
       </Fade>
     </Modal>
   );

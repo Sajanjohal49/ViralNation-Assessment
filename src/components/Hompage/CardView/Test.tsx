@@ -24,9 +24,6 @@ const Test = () => {
   const [searchString, setSearchString] = useState("");
   const [profiles, setProfiles] = useState<Profile[]>([]);
 
-  const [shouldReload, setShouldReload] = useState(false);
-
-  const [debouncedSearchString, setDebouncedSearchString] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalProfiles, setTotalProfiles] = useState(0);
@@ -36,6 +33,7 @@ const Test = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [hasMoreProfiles, setHasMoreProfiles] = useState(true);
+
   const handleOpen = () => {
     setOpen(true);
   };
@@ -72,10 +70,11 @@ const Test = () => {
 
   useEffect(() => {
     setProfiles([]);
-
+    setCurrentPage(0);
+    setHasMoreProfiles(true);
     getAllProfiles({
       variables: {
-        page: currentPage,
+        page: 0,
         rows: pageSize,
         searchString: searchString,
       },
@@ -129,29 +128,25 @@ const Test = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [currentPage, pageSize, getAllProfiles, searchString]);
+  }, [currentPage, pageSize, getAllProfiles]);
 
   useEffect(() => {
     getAllProfiles({
       variables: {
         page: currentPage,
         rows: pageSize,
+
         searchString: searchString,
       },
     });
-  }, [currentPage, searchString]);
+  }, [currentPage, pageSize]);
 
   const debouncedSearch = useRef(
     debounce((value: string) => {
       setSearchString(value);
-      setShouldReload(value === "");
     }, 700)
   ).current;
-  useEffect(() => {
-    if (shouldReload) {
-      window.location.reload();
-    }
-  }, [shouldReload]);
+
   const loadMoreProfiles = () => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
@@ -168,7 +163,7 @@ const Test = () => {
     return <p>Error: {error.message}</p>;
   }
   return (
-    <Box sx={{ maxWidth: "1300px", margin: "30px auto" }}>
+    <Box sx={{ maxWidth: "1300px", margin: " auto" }}>
       <SearchAndCreateProfile
         searchInput={searchInput}
         handleInputChange={handleInputChange}

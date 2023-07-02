@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   Grid,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
@@ -37,99 +38,96 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
       lg={3}
       zeroMinWidth
       padding={1}>
-      <Card
+      {/* ********Shrinkable******** */}
+      <Paper
         sx={{
           borderRadius: "10px",
-          padding: 1,
+          padding: 3,
 
-          backgroundColor: grey[200],
+          color: "text.primary",
           boxShadow: "none",
           overflow: "hidden",
           textOverflow: "ellipsis",
         }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              paddingBottom: 2,
-            }}>
-            <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
-              <Box>
-                <Item
-                  sx={{
-                    mx: "auto",
-                  }}>
-                  <Stack spacing={2} direction="row" alignItems="center">
-                    <Avatar
-                      alt={profile.image_url}
-                      src={profile.image_url}
-                      sx={{ width: 56, height: 56 }}
-                    />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            paddingBottom: 2,
+          }}>
+          <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+            <Box>
+              <Item
+                sx={{
+                  mx: "auto",
+                }}>
+                <Stack spacing={2} direction="row" alignItems="center">
+                  <Avatar
+                    alt={profile.image_url}
+                    src={profile.image_url}
+                    sx={{ width: 56, height: 56 }}
+                  />
 
+                  <Typography
+                    component="div"
+                    noWrap
+                    sx={{
+                      display: "flex",
+
+                      flexDirection: "column",
+                    }}>
                     <Typography
-                      component="div"
                       noWrap
+                      variant="subtitle2"
                       sx={{
-                        color: grey[900],
-                        display: "flex",
-
-                        flexDirection: "column",
+                        textAlign: "left",
                       }}>
-                      <Typography
-                        noWrap
-                        variant="subtitle2"
+                      {profile.first_name} {profile.last_name}
+                      <VerifiedIcon
                         sx={{
-                          color: grey[900],
-                          textAlign: "left",
-                        }}>
-                        {profile.first_name} {profile.last_name}
-                        <VerifiedIcon
-                          sx={{
-                            color: blue[500],
-                            width: 20,
-                            height: 20,
-                            verticalAlign: "middle",
-                          }}
-                        />
-                      </Typography>
-                      <Typography
-                        noWrap
-                        variant="caption"
-                        sx={{
-                          textAlign: "left",
-                          color: grey[800],
-                        }}>
-                        {profile.email}
-                      </Typography>
+                          color: blue[500],
+                          width: 20,
+                          height: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
                     </Typography>
-                    <Box
+                    <Typography
+                      noWrap
+                      variant="caption"
                       sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        alignItems: "flex-end",
+                        textAlign: "left",
+                        color: "text.secondary",
                       }}>
-                      <Actions profileId={profile.id} />
-                    </Box>
-                  </Stack>
-                </Item>
-              </Box>
+                      {profile.email}
+                    </Typography>
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                    }}>
+                    <Actions profileId={profile.id} />
+                  </Box>
+                </Stack>
+              </Item>
             </Box>
           </Box>
+        </Box>
 
-          <Box>
-            <Typography
-              variant="caption"
-              sx={{
-                fontSize: "0.7rem",
-                lineHeight: "14px",
-                color: grey[700],
-              }}>
-              {profile.description}
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
+        <Box>
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.7rem",
+              lineHeight: "14px",
+              color: "text.secondary",
+            }}>
+            {profile.description}
+          </Typography>
+        </Box>
+      </Paper>
     </Grid>
   );
 };

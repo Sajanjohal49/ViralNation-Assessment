@@ -4,9 +4,11 @@ import {
   Button,
   Fade,
   Grid,
+  IconButton,
   Input,
   InputLabel,
   Modal,
+  Paper,
   Switch,
   TextField,
   Typography,
@@ -151,16 +153,17 @@ const EditProfile: React.FC<EditProfileProps> = ({
     <div>
       <Modal open={open} onClose={handleClose} closeAfterTransition>
         <Fade in={open}>
-          <Box
+          <Paper
             sx={{
               display: "relative",
               position: "fixed",
               top: "50%",
               left: "50%",
-              bgcolor: "#fff",
+              bgcolor: "background.default",
+              color: "text.default",
               transform: "translate(-50%, -50%)",
               width: isSmallScreen ? "100%" : "60vw",
-              height: isSmallScreen ? "100%" : "100%",
+              height: isSmallScreen ? "100%" : "95%",
               outline: "none",
               boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
             }}>
@@ -172,10 +175,11 @@ const EditProfile: React.FC<EditProfileProps> = ({
                 alignItems: "center",
                 height: "30px",
                 borderBottom: "1px solid lightgrey",
-                color: grey[800],
               }}>
               <Typography variant="h6">Edit Profile</Typography>
-              <CloseIcon onClick={handleClose} />
+              <IconButton onClick={handleClose}>
+                <CloseIcon />
+              </IconButton>
             </Box>
             <Box sx={{ display: "flex", flexWrap: "wrap" }}>
               <form onSubmit={handleSubmit}>
@@ -183,7 +187,9 @@ const EditProfile: React.FC<EditProfileProps> = ({
                   <Box sx={{ padding: "30px 60px" }}>
                     <Grid container spacing={2} rowSpacing={3}>
                       <Grid item xs={12}>
-                        <InputLabel>Image Url</InputLabel>
+                        <InputLabel sx={{ fontSize: "13px" }}>
+                          Image Url
+                        </InputLabel>
                         <TextField
                           name="image_url"
                           size="small"
@@ -193,7 +199,9 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         />
                       </Grid>
                       <Grid item xs={6}>
-                        <InputLabel>First name</InputLabel>
+                        <InputLabel sx={{ fontSize: "13px" }}>
+                          First name
+                        </InputLabel>
                         <TextField
                           name="first_name"
                           size="small"
@@ -203,7 +211,9 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         />
                       </Grid>
                       <Grid item xs={6}>
-                        <InputLabel>Last name</InputLabel>
+                        <InputLabel sx={{ fontSize: "13px" }}>
+                          Last name
+                        </InputLabel>
                         <TextField
                           name="last_name"
                           size="small"
@@ -213,7 +223,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         />
                       </Grid>
                       <Grid item xs={12}>
-                        <InputLabel>Email</InputLabel>
+                        <InputLabel sx={{ fontSize: "13px" }}>Email</InputLabel>
                         <TextField
                           name="email"
                           size="small"
@@ -223,8 +233,12 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         />
                       </Grid>
                       <Grid item xs={12}>
-                        <InputLabel>Description</InputLabel>
+                        <InputLabel sx={{ fontSize: "13px" }}>
+                          Description
+                        </InputLabel>
                         <TextField
+                          multiline
+                          rows={4}
                           name="description"
                           size="small"
                           fullWidth
@@ -233,14 +247,16 @@ const EditProfile: React.FC<EditProfileProps> = ({
                         />
                       </Grid>
                       <Grid item xs={12}>
-                        <InputLabel>Verification</InputLabel>
+                        <InputLabel sx={{ fontSize: "13px" }}>
+                          Verification
+                        </InputLabel>
                         <Box
                           sx={{
                             display: "flex",
                             justifyContent: "space-between",
-                            color: grey[700],
+                            color: "text.primary",
                             padding: "7px 10px",
-                            bgcolor: grey[300],
+                            bgcolor: "divider",
                             borderRadius: "4px",
                           }}>
                           <Typography
@@ -248,10 +264,12 @@ const EditProfile: React.FC<EditProfileProps> = ({
                               justifyContent: "center",
                               alignItems: "center",
                               display: "flex",
+                              fontSize: "14px",
                             }}>
                             Talent is verified
                           </Typography>
                           <Switch
+                            sx={{ color: "text.primary" }}
                             checked={formData.is_verified}
                             defaultChecked={formData.is_verified}
                             onChange={handleSwitchChange}
@@ -282,7 +300,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                 </Box>
               </form>
             </Box>
-          </Box>
+          </Paper>
         </Fade>
       </Modal>
     </div>

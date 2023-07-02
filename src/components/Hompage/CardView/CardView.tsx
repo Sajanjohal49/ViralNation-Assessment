@@ -29,7 +29,6 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import CreateProfile from "../CreateProfile/CreateProfile";
 import styled from "@emotion/styled";
-import { DarkModeContext } from "../../hook/DarkModeContext";
 import DeleteProfile from "../DeleteProfile/DeleteProfile";
 import EditProfile from "../EditProfile/EditProfile";
 import Actions from "./Actions";
@@ -85,7 +84,6 @@ const CardView: React.FC<CardViewProps> = () => {
   const muiTheme = createTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
 
-  const { darkMode } = useContext(DarkModeContext);
   const [open, setOpen] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [searchString, setSearchString] = useState("");
@@ -175,8 +173,6 @@ const CardView: React.FC<CardViewProps> = () => {
     }
   }, [profiles, data?.getAllProfiles.size]);
 
-  const cardBackground = darkMode ? "#000000" : grey[200];
-
   return (
     <Box>
       <Grid
@@ -255,7 +251,6 @@ const CardView: React.FC<CardViewProps> = () => {
                   borderRadius: "10px",
                   padding: 1,
 
-                  backgroundColor: cardBackground,
                   boxShadow: "none",
                   overflow: "hidden",
                   textOverflow: "ellipsis",

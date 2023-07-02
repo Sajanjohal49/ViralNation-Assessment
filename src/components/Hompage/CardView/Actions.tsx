@@ -70,14 +70,14 @@ const Actions: React.FunctionComponent<IActionsProps> = ({ profileId }) => {
         open={openMenu}
         onClose={handleCloseMenu}>
         <MenuItem
-          sx={{ fontSize: "15px" }}
+          sx={{ fontSize: "14px" }}
           onClick={() => {
             handleEdit(profileId);
           }}>
           Edit
         </MenuItem>
         <MenuItem
-          sx={{ fontSize: "15px" }}
+          sx={{ fontSize: "14px" }}
           onClick={() => {
             handleDelete(profileId);
           }}>
