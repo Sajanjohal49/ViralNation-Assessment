@@ -1,25 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useQuery } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Input,
-  TextField,
-  Typography,
-  createTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { useLazyQuery } from "@apollo/client";
+
+import { Box, CircularProgress, Grid } from "@mui/material";
 import { GET_ALL_PROFILES } from "../../queries/getAllProfiles";
 import debounce from "lodash/debounce";
-import styled from "@emotion/styled";
+
 import ProfileGridItem from "./ProfileGridItem";
 
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import CreateProfile from "../CreateProfile/CreateProfile";
 import SearchAndCreateProfile from "./SearchAndCreateProfile";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 type Profile = {
   id: string;
@@ -34,16 +23,19 @@ type Profile = {
 const Test = () => {
   const [searchString, setSearchString] = useState("");
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [doneLoad, setDoneLoad] = useState(0);
+
   const [shouldReload, setShouldReload] = useState(false);
+
+  const [debouncedSearchString, setDebouncedSearchString] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [totalProfiles, setTotalProfiles] = useState(0);
+
   const [open, setOpen] = useState(false);
   const pageSize = 16;
   const containerRef = useRef<HTMLDivElement>(null);
-  const loadingMoreRef = useRef(false);
-  const muiTheme = createTheme();
-  const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
+
+  const [hasMoreProfiles, setHasMoreProfiles] = useState(true);
   const handleOpen = () => {
     setOpen(true);
   };
@@ -52,35 +44,43 @@ const Test = () => {
     setOpen(false);
   };
 
-  const { loading, error, data } = useQuery(GET_ALL_PROFILES, {
-    variables: {
-      page: currentPage,
-      rows: pageSize,
-      searchString: searchString,
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  const [getAllProfiles, { loading, error, data }] = useLazyQuery(
+    GET_ALL_PROFILES,
+    {
+      fetchPolicy: "network-only",
+    }
+  );
 
   useEffect(() => {
     if (data && data.getAllProfiles) {
       const newProfiles = data.getAllProfiles.profiles;
       console.log("Total Profiles: " + data.getAllProfiles.size);
-
+      setTotalProfiles(data.getAllProfiles.size);
       setProfiles((prevProfiles) => [...prevProfiles, ...newProfiles]);
-      setDoneLoad((prevDoneLoad) => prevDoneLoad + newProfiles.length);
-      loadingMoreRef.current = false;
     }
-  }, [data, setShouldReload]);
+  }, [data, searchString]);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
-    const target = entries[0];
-    if (target.isIntersecting && !loadingMoreRef.current) {
-      loadingMoreRef.current = true;
+    const isIntersecting = entries[0].isIntersecting;
+
+    if (isIntersecting && hasMoreProfiles) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
+
+  useEffect(() => {
+    setProfiles([]);
+
+    getAllProfiles({
+      variables: {
+        page: currentPage,
+        rows: pageSize,
+        searchString: searchString,
+      },
+    });
+  }, [searchString]);
 
   useEffect(() => {
     observer.current = new IntersectionObserver(handleObserver, {
@@ -104,10 +104,23 @@ const Test = () => {
       if (
         containerRef.current &&
         window.innerHeight + window.scrollY >=
-          containerRef.current.offsetTop + containerRef.current.offsetHeight
+          containerRef.current.offsetTop + containerRef.current.offsetHeight &&
+        !loading &&
+        profiles.length < totalProfiles
       ) {
-        loadingMoreRef.current = true;
-        setCurrentPage((prevPage) => prevPage + 1);
+        if (!hasMoreProfiles) {
+          window.removeEventListener("scroll", handleScroll);
+          return; // Stop making queries if there are no more profiles
+        }
+        // setCurrentPage((prevPage) => prevPage + 1);
+
+        getAllProfiles({
+          variables: {
+            page: currentPage,
+            rows: pageSize,
+            searchString: searchString,
+          },
+        });
       }
     };
 
@@ -116,27 +129,22 @@ const Test = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [currentPage, pageSize, getAllProfiles, searchString]);
 
   useEffect(() => {
-    if (!loading) {
-      loadingMoreRef.current = false;
-    }
-  }, [loading]);
-
-  useEffect(() => {
-    setProfiles([]);
-    setDoneLoad(0);
-    setCurrentPage(0);
-    loadingMoreRef.current = false;
-  }, [searchString]);
+    getAllProfiles({
+      variables: {
+        page: currentPage,
+        rows: pageSize,
+        searchString: searchString,
+      },
+    });
+  }, [currentPage, searchString]);
 
   const debouncedSearch = useRef(
     debounce((value: string) => {
       setSearchString(value);
-      if (value === "") {
-        setShouldReload(true);
-      } else setShouldReload(false);
+      setShouldReload(value === "");
     }, 700)
   ).current;
   useEffect(() => {
@@ -144,6 +152,9 @@ const Test = () => {
       window.location.reload();
     }
   }, [shouldReload]);
+  const loadMoreProfiles = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -165,11 +176,21 @@ const Test = () => {
         open={open}
         handleClose={handleClose}
       />
-
       {loading && !profiles.length ? (
-        <p>Loading...</p>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          sx={{ height: "100px" }} // Adjust the height as needed
+        >
+          <CircularProgress color="secondary" />
+        </Grid>
       ) : (
-        <div ref={containerRef}>
+        <InfiniteScroll
+          dataLength={profiles.length}
+          next={loadMoreProfiles}
+          hasMore={hasMoreProfiles}
+          loader={<p></p>}>
           <Grid
             container
             sx={{
@@ -179,7 +200,7 @@ const Test = () => {
               <ProfileGridItem key={profile.id} profile={profile} />
             ))}
           </Grid>
-        </div>
+        </InfiniteScroll>
       )}
     </Box>
   );

@@ -1,5 +1,11 @@
 import React from "react";
-import { Box, TextField, Button } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  useMediaQuery,
+  createTheme,
+} from "@mui/material";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import CreateProfile from "../CreateProfile/CreateProfile";
 
@@ -18,16 +24,20 @@ const SearchAndCreateProfile: React.FC<SearchAndCreateProfileProps> = ({
   open,
   handleClose,
 }) => {
+  const muiTheme = createTheme();
+  const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
+
   return (
     <Box
       sx={{
         padding: "20px 0",
+        display: isSmallScreen ? "relative" : "flex",
       }}>
       <TextField
         type="text"
         size="small"
         fullWidth
-        sx={{ padding: "0px 10px 0px" }}
+        sx={{ padding: isSmallScreen ? "0px" : "10px" }}
         value={searchInput}
         onChange={handleInputChange}
         placeholder="Search Profiles"
@@ -45,6 +55,8 @@ const SearchAndCreateProfile: React.FC<SearchAndCreateProfileProps> = ({
             alignItems: "center",
             textTransform: "none",
             minWidth: "10rem",
+            padding: "7px",
+            marginTop: isSmallScreen ? "10px" : "",
             borderRadius: "10px",
           }}
           onClick={handleOpen}>

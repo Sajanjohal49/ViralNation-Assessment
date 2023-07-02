@@ -68,6 +68,7 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
                     />
 
                     <Typography
+                      component="div"
                       noWrap
                       sx={{
                         color: grey[900],

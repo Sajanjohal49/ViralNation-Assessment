@@ -5,6 +5,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { grey } from "@mui/material/colors";
 import { DarkModeContext } from "../hook/DarkModeContext";
+import { Link } from "react-router-dom";
 
 export const Navbar: React.FC = () => {
   const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
@@ -38,25 +39,24 @@ export const Navbar: React.FC = () => {
     <ThemeProvider theme={theme}>
       <AppBar position="static" sx={{ boxShadow: "none" }}>
         <Toolbar>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-            <Typography
-              variant="h3"
-              style={{ fontFamily: "DM Serif Display, sans-serif" }}>
-              V
-            </Typography>
+          <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+              <Typography
+                variant="h3"
+                style={{ fontFamily: "DM Serif Display, sans-serif" }}>
+                V
+              </Typography>
+              <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
+                iral Nation
+              </Typography>
+            </Box>
+          </a>
 
-            <Typography
-              variant="subtitle2"
-              component="div"
-              sx={{ flexGrow: 1 }}>
-              iral Nation
-            </Typography>
-          </Box>
           <div
             style={{
               display: "flex",

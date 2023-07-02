@@ -1,7 +1,14 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
-import { useQuery } from "@apollo/client";
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { useLazyQuery } from "@apollo/client";
+
+import { Box, CircularProgress, Grid } from "@mui/material";
 import { GET_ALL_PROFILES } from "../../queries/getAllProfiles";
+import debounce from "lodash/debounce";
+
+import ProfileGridItem from "./ProfileGridItem";
+
+import SearchAndCreateProfile from "./SearchAndCreateProfile";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 type Profile = {
   id: string;
@@ -14,46 +21,66 @@ type Profile = {
 };
 
 const Test = () => {
-  // search String Code
   const [searchString, setSearchString] = useState("");
-
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [doneLoad, setDoneLoad] = useState(0);
+
+  const [shouldReload, setShouldReload] = useState(false);
+
+  const [debouncedSearchString, setDebouncedSearchString] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [totalProfiles, setTotalProfiles] = useState(0);
+
+  const [open, setOpen] = useState(false);
   const pageSize = 16;
   const containerRef = useRef<HTMLDivElement>(null);
-  const loadingMoreRef = useRef(false);
-  const [totalProfiles, setTotalProfiles] = useState<number>(0);
 
-  const { loading, error, data } = useQuery(GET_ALL_PROFILES, {
-    variables: {
-      page: currentPage,
-      rows: pageSize,
-    },
-  });
+  const [hasMoreProfiles, setHasMoreProfiles] = useState(true);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const [getAllProfiles, { loading, error, data }] = useLazyQuery(
+    GET_ALL_PROFILES,
+    {
+      fetchPolicy: "network-only",
+    }
+  );
 
   useEffect(() => {
     if (data && data.getAllProfiles) {
       const newProfiles = data.getAllProfiles.profiles;
       console.log("Total Profiles: " + data.getAllProfiles.size);
-
+      setTotalProfiles(data.getAllProfiles.size);
       setProfiles((prevProfiles) => [...prevProfiles, ...newProfiles]);
-      setTotalProfiles(data.getAllProfiles.total);
-      setDoneLoad((prevDoneLoad) => prevDoneLoad + newProfiles.length);
-      loadingMoreRef.current = false;
     }
-  }, [data]);
-  console.log(doneLoad);
+  }, [data, searchString]);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
-    const target = entries[0];
-    if (target.isIntersecting && !loadingMoreRef.current) {
-      loadingMoreRef.current = true;
+    const isIntersecting = entries[0].isIntersecting;
+
+    if (isIntersecting && hasMoreProfiles) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
+
+  useEffect(() => {
+    setProfiles([]);
+
+    getAllProfiles({
+      variables: {
+        page: currentPage,
+        rows: pageSize,
+        searchString: searchString,
+      },
+    });
+  }, [searchString]);
 
   useEffect(() => {
     observer.current = new IntersectionObserver(handleObserver, {
@@ -77,10 +104,23 @@ const Test = () => {
       if (
         containerRef.current &&
         window.innerHeight + window.scrollY >=
-          containerRef.current.offsetTop + containerRef.current.offsetHeight
+          containerRef.current.offsetTop + containerRef.current.offsetHeight &&
+        !loading &&
+        profiles.length < totalProfiles
       ) {
-        loadingMoreRef.current = true;
-        setCurrentPage((prevPage) => prevPage + 1);
+        if (!hasMoreProfiles) {
+          window.removeEventListener("scroll", handleScroll);
+          return; // Stop making queries if there are no more profiles
+        }
+        // setCurrentPage((prevPage) => prevPage + 1);
+
+        getAllProfiles({
+          variables: {
+            page: currentPage,
+            rows: pageSize,
+            searchString: searchString,
+          },
+        });
       }
     };
 
@@ -89,53 +129,80 @@ const Test = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [currentPage, pageSize, getAllProfiles, searchString]);
 
   useEffect(() => {
-    // Reset loadingMoreRef when loading changes to false
-    if (!loading) {
-      loadingMoreRef.current = false;
-    }
-  }, [loading]);
-
-  const filteredProfiles = useMemo(() => {
-    const uniqueProfiles = new Map<string, Profile>();
-    profiles.forEach((profile) => {
-      uniqueProfiles.set(profile.id, profile);
+    getAllProfiles({
+      variables: {
+        page: currentPage,
+        rows: pageSize,
+        searchString: searchString,
+      },
     });
+  }, [currentPage, searchString]);
 
-    return Array.from(uniqueProfiles.values());
-  }, [profiles]);
+  const debouncedSearch = useRef(
+    debounce((value: string) => {
+      setSearchString(value);
+      setShouldReload(value === "");
+    }, 700)
+  ).current;
+  useEffect(() => {
+    if (shouldReload) {
+      window.location.reload();
+    }
+  }, [shouldReload]);
+  const loadMoreProfiles = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
 
-  if (loading && !profiles.length) {
-    return <p>Loading...</p>;
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    debouncedSearch(value);
+
+    // Set the flag to reload the page if input is empty
+  };
 
   if (error) {
     return <p>Error: {error.message}</p>;
   }
-
-  const renderMoreProfiles = filteredProfiles.length !== doneLoad;
-  console.log(filteredProfiles);
   return (
-    <div>
-      <div ref={containerRef}>
-        <Grid container spacing={2}>
-          {filteredProfiles.map((profile, index) => (
-            <Grid item xs={4} key={profile.id}>
-              <Card sx={{ width: "300px ", height: "500px" }}>
-                <CardContent>
-                  <Typography>{profile.id}</Typography>
-                  <Typography variant="h6">{profile.first_name}</Typography>
-                  {/* Render other profile details */}
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+    <Box sx={{ maxWidth: "1300px", margin: "30px auto" }}>
+      <SearchAndCreateProfile
+        searchInput={searchInput}
+        handleInputChange={handleInputChange}
+        handleOpen={handleOpen}
+        open={open}
+        handleClose={handleClose}
+      />
+      {loading && !profiles.length ? (
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          sx={{ height: "100px" }} // Adjust the height as needed
+        >
+          <CircularProgress color="secondary" />
         </Grid>
-        {renderMoreProfiles && <p>Loading more profiles...</p>}
-      </div>
-    </div>
+      ) : (
+        <InfiniteScroll
+          dataLength={profiles.length}
+          next={loadMoreProfiles}
+          hasMore={hasMoreProfiles}
+          loader={<p></p>}>
+          <Grid
+            container
+            sx={{
+              boxShadow: "none",
+            }}>
+            {profiles.map((profile) => (
+              <ProfileGridItem key={profile.id} profile={profile} />
+            ))}
+          </Grid>
+        </InfiniteScroll>
+      )}
+    </Box>
   );
 };
 
