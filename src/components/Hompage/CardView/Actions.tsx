@@ -3,21 +3,9 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { profile } from "console";
-import { gql, useLazyQuery } from "@apollo/client";
+
 import EditProfile from "../EditProfile/EditProfile";
 import DeleteProfile from "../DeleteProfile/DeleteProfile";
-import { Box } from "@mui/material";
-
-type Profile = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  is_verified: boolean;
-  image_url: string;
-  description: string;
-};
 
 interface IActionsProps {
   profileId: string;
@@ -27,9 +15,6 @@ const Actions: React.FunctionComponent<IActionsProps> = ({ profileId }) => {
   const [openEditModal, setOpenEditModal] = React.useState(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [fetchedProfile, setFetchedProfile] = React.useState<Profile | null>(
-    null
-  );
 
   const [selectedProfileId, setSelectedProfileId] = React.useState<string>("");
   const openMenu = Boolean(anchorEl);

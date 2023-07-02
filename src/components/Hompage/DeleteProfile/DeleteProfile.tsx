@@ -2,18 +2,16 @@ import {
   Box,
   Button,
   Fade,
+  IconButton,
   Modal,
+  Paper,
   Typography,
-  alpha,
   unstable_createMuiStrictModeTheme,
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
-import { useTheme } from "@emotion/react";
-import { grey, red } from "@mui/material/colors";
-import { Padding } from "@mui/icons-material";
 import { gql, useMutation } from "@apollo/client";
 
 const DELETE_PROFILE = gql`
@@ -31,7 +29,6 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
   open,
   selectedProfileId,
 }) => {
-  const theme = useTheme();
   const muiTheme = unstable_createMuiStrictModeTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
   const [deleteProfile] = useMutation(DELETE_PROFILE);
@@ -42,22 +39,17 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
         variables: { deleteProfileId: selectedProfileId },
       });
 
-      // Handle successful deletion here
-
       handleClose();
       window.location.reload();
     } catch (error) {
       console.error(error);
-      // Handle error here
     }
   };
 
   return (
     <Modal open={open} onClose={handleClose} closeAfterTransition>
       <Fade in={open}>
-        {/* Add your modal content here */}
-        {/* For example: */}
-        <Box
+        <Paper
           sx={{
             display: "relative",
             position: "fixed",
@@ -68,10 +60,6 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
             transform: "translate(-50%, -50%)",
             width: isSmallScreen ? "70%" : "500px",
             maxHeight: isSmallScreen ? "100%" : "400px",
-
-            outline: "none",
-
-            boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
           }}>
           <Box
             sx={{
@@ -85,7 +73,10 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
               color: "text.primary",
             }}>
             <Typography variant="h6">Remove Profile</Typography>
-            <CloseIcon onClick={handleClose} />
+            <IconButton onClick={handleClose}>
+              {" "}
+              <CloseIcon />
+            </IconButton>
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", padding: "50px" }}>
             <Typography variant="caption">
@@ -124,7 +115,7 @@ const DeleteProfile: React.FC<DeleteProfileProps> = ({
               Delete
             </Button>
           </Box>
-        </Box>
+        </Paper>
       </Fade>
     </Modal>
   );

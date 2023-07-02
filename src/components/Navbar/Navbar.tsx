@@ -1,11 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
 import { AppBar, Toolbar, Typography, Switch, Box } from "@mui/material";
-import { createTheme, Theme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { grey } from "@mui/material/colors";
 import { ColorModeContext } from "../hook/DarkModeContext";
-import { Link } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 
 export const Navbar: React.FC = () => {
@@ -18,11 +16,16 @@ export const Navbar: React.FC = () => {
         position="static"
         sx={{
           bgcolor: "action.disabledBackground",
-
+          padding: "0px 10px ",
           color: "text.primary",
         }}>
         <Toolbar>
-          <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
+          <a
+            href="/"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+            }}>
             <Box
               sx={{
                 display: "flex",

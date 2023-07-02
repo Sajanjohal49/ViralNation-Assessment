@@ -5,65 +5,20 @@ import {
   Fade,
   Grid,
   IconButton,
-  Input,
   InputLabel,
   Modal,
   Paper,
   Switch,
   TextField,
   Typography,
-  createMuiTheme,
   createTheme,
   useMediaQuery,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 
 import CloseIcon from "@mui/icons-material/Close";
-
-const GET_PROFILE_DETAILS = gql`
-  query GetProfileById($getProfileById: String!) {
-    getProfileById(id: $getProfileById) {
-      id
-      first_name
-      last_name
-      email
-      is_verified
-      image_url
-      description
-    }
-  }
-`;
-
-const UPDATE_PROFILE = gql`
-  mutation UpdateProfile(
-    $updateProfileId: String!
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $isVerified: Boolean!
-    $imageUrl: String!
-    $description: String!
-  ) {
-    updateProfile(
-      id: $updateProfileId
-      first_name: $firstName
-      last_name: $lastName
-      email: $email
-      is_verified: $isVerified
-      image_url: $imageUrl
-      description: $description
-    ) {
-      id
-      first_name
-      last_name
-      email
-      is_verified
-      image_url
-      description
-    }
-  }
-`;
+import { GET_PROFILE_DETAILS } from "../../queries/getProfileDetails";
+import { UPDATE_PROFILE } from "../../queries/editProfiles";
 
 type Profile = {
   id: string;
@@ -89,16 +44,14 @@ const EditProfile: React.FC<EditProfileProps> = ({
   const muiTheme = createTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
   const [formData, setFormData] = useState<Partial<Profile>>({});
+  const [formErrors, setFormErrors] = useState<Partial<Profile>>({});
 
-  const [fetchProfileDetails, { data: profileData }] = useLazyQuery(
-    GET_PROFILE_DETAILS,
-    {
-      onCompleted: (data) => {
-        const fetchedProfileData = data.getProfileById;
-        setFormData(fetchedProfileData);
-      },
-    }
-  );
+  const [fetchProfileDetails] = useLazyQuery(GET_PROFILE_DETAILS, {
+    onCompleted: (data) => {
+      const fetchedProfileData = data.getProfileById;
+      setFormData(fetchedProfileData);
+    },
+  });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
@@ -112,15 +65,40 @@ const EditProfile: React.FC<EditProfileProps> = ({
     event.preventDefault();
 
     try {
+      // Validate form data
+      const errors: Partial<Profile> = {};
+      if (!formData.first_name) {
+        errors.first_name = "First name is required";
+      }
+      if (!formData.last_name) {
+        errors.last_name = "Last name is required";
+      }
+      if (!formData.email) {
+        errors.email = "Email is required";
+      }
+      if (!formData.description) {
+        errors.description = "description is required";
+      }
+      // You can add more validation rules here
+
+      // Set form errors
+      setFormErrors(errors);
+
+      // Check if there are any validation errors
+      if (Object.keys(errors).length > 0) {
+        return;
+      }
+
+      // Submit the form if there are no errors
       await updateProfile({
         variables: {
           updateProfileId: selectedProfileId,
-          firstName: formData.first_name || "",
-          lastName: formData.last_name || "",
-          email: formData.email || "",
+          firstName: formData.first_name,
+          lastName: formData.last_name,
+          email: formData.email,
           isVerified: formData.is_verified || false,
-          imageUrl: formData.image_url || "",
-          description: formData.description || "",
+          imageUrl: formData.image_url,
+          description: formData.description,
         },
       });
 
@@ -206,8 +184,10 @@ const EditProfile: React.FC<EditProfileProps> = ({
                           name="first_name"
                           size="small"
                           fullWidth
-                          value={formData.first_name || ""}
+                          value={formData.first_name}
                           onChange={handleChange}
+                          error={!!formErrors.first_name}
+                          helperText={formErrors.first_name}
                         />
                       </Grid>
                       <Grid item xs={6}>
@@ -220,6 +200,8 @@ const EditProfile: React.FC<EditProfileProps> = ({
                           fullWidth
                           value={formData.last_name || ""}
                           onChange={handleChange}
+                          error={!!formErrors.last_name}
+                          helperText={formErrors.last_name}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -230,6 +212,8 @@ const EditProfile: React.FC<EditProfileProps> = ({
                           fullWidth
                           value={formData.email || ""}
                           onChange={handleChange}
+                          error={!!formErrors.email}
+                          helperText={formErrors.email}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -244,6 +228,8 @@ const EditProfile: React.FC<EditProfileProps> = ({
                           fullWidth
                           value={formData.description || ""}
                           onChange={handleChange}
+                          error={!!formErrors.description}
+                          helperText={formErrors.description}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -271,7 +257,6 @@ const EditProfile: React.FC<EditProfileProps> = ({
                           <Switch
                             sx={{ color: "text.primary" }}
                             checked={formData.is_verified}
-                            defaultChecked={formData.is_verified}
                             onChange={handleSwitchChange}
                             inputProps={{ "aria-label": "controlled" }}
                           />
@@ -292,8 +277,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
                       type="submit"
                       variant="contained"
                       color="primary"
-                      sx={{ margin: "20px 20px", textTransform: "none" }}
-                      onClick={handleClose}>
+                      sx={{ margin: "20px 20px", textTransform: "none" }}>
                       Update Profile
                     </Button>
                   </Box>

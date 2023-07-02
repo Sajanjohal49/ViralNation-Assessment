@@ -79,7 +79,7 @@ const Test = () => {
         searchString: searchString,
       },
     });
-  }, [searchString]);
+  }, [searchString, getAllProfiles]);
 
   useEffect(() => {
     observer.current = new IntersectionObserver(handleObserver, {
@@ -96,7 +96,7 @@ const Test = () => {
         observer.current.disconnect();
       }
     };
-  }, []);
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -128,8 +128,16 @@ const Test = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [currentPage, pageSize, getAllProfiles]);
-
+  }, [
+    currentPage,
+    pageSize,
+    getAllProfiles,
+    searchString,
+    hasMoreProfiles,
+    loading,
+    profiles.length,
+    totalProfiles,
+  ]);
   useEffect(() => {
     getAllProfiles({
       variables: {
@@ -139,7 +147,7 @@ const Test = () => {
         searchString: searchString,
       },
     });
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, getAllProfiles, searchString]);
 
   const debouncedSearch = useRef(
     debounce((value: string) => {

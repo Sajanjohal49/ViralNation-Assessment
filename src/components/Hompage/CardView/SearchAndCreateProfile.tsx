@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import CreateProfile from "../CreateProfile/CreateProfile";
-import { useTheme } from "@emotion/react";
 
 type SearchAndCreateProfileProps = {
   searchInput: string;
@@ -25,8 +24,6 @@ const SearchAndCreateProfile: React.FC<SearchAndCreateProfileProps> = ({
   open,
   handleClose,
 }) => {
-  const theme = useTheme();
-
   // Use the theme object to determine the border color
 
   const muiTheme = createTheme();

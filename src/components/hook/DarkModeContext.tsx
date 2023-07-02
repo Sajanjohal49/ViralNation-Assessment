@@ -1,7 +1,6 @@
-import { Theme } from "@emotion/react";
-import { CSSInterpolation, ThemeProvider, createTheme } from "@mui/material";
-import { amber, blue, deepOrange, grey } from "@mui/material/colors";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { ThemeProvider, createTheme } from "@mui/material";
+import { blue, grey } from "@mui/material/colors";
+import React from "react";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},

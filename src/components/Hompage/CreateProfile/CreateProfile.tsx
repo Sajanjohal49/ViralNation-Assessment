@@ -1,6 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
-import { useTheme } from "@emotion/react";
-import { Height } from "@mui/icons-material";
+import { useMutation } from "@apollo/client";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -8,7 +6,6 @@ import {
   Fade,
   Grid,
   IconButton,
-  Input,
   InputLabel,
   Modal,
   Paper,
@@ -18,43 +15,25 @@ import {
   unstable_createMuiStrictModeTheme as createMuiTheme,
   useMediaQuery,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
 
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React from "react";
+import { CREATE_PROFILE_MUTATION } from "../../queries/createProfile";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
 type CreateProfileProps = {
   open: boolean;
   handleClose: () => void;
 };
-const CREATE_PROFILE_MUTATION = gql`
-  mutation CreateProfile(
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $isVerified: Boolean!
-    $imageUrl: String!
-    $description: String!
-  ) {
-    createProfile(
-      first_name: $firstName
-      last_name: $lastName
-      email: $email
-      is_verified: $isVerified
-      image_url: $imageUrl
-      description: $description
-    ) {
-      id
-      first_name
-      last_name
-      email
-      is_verified
-      image_url
-      description
-    }
-  }
-`;
+const validationSchema = Yup.object({
+  imageUrl: Yup.string().required("Image URL is required"),
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  description: Yup.string().required("Description is required"),
+});
 
 const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
-  const theme = useTheme();
   const muiTheme = createMuiTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
   const [createProfile] = useMutation(CREATE_PROFILE_MUTATION);
@@ -63,44 +42,40 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
   const handleSwitch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
   };
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    isVerified: checked,
-    imageUrl: "",
-    description: "",
+
+  const formik = useFormik({
+    initialValues: {
+      imageUrl: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      description: "",
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      // Handle form submission
+      console.log("Form submitted", values);
+      const { imageUrl, firstName, lastName, email, description } = values;
+      const variables = {
+        imageUrl,
+        firstName,
+        lastName,
+        email,
+        isVerified: checked,
+        description,
+      };
+
+      try {
+        const response = await createProfile({ variables });
+        window.location.reload();
+        console.log("Profile created:", response.data.createProfile);
+        handleClose(); // Close the modal after successful profile creation
+      } catch (error) {
+        console.error("Error creating profile:", error);
+      }
+    },
   });
 
-  const handleChange = (event: any) => {
-    const { name, value } = event.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log("Form submitted", formData);
-    const variables = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      isVerified: formData.isVerified,
-      imageUrl: formData.imageUrl,
-      description: formData.description,
-    };
-
-    try {
-      const response = await createProfile({ variables });
-      window.location.reload();
-      console.log("Profile created:", response.data.createProfile);
-      handleClose(); // Close the modal after successful profile creation
-    } catch (error) {
-      console.error("Error creating profile:", error);
-    }
-  };
   return (
     <Modal open={open} onClose={handleClose} closeAfterTransition>
       <Fade in={open}>
@@ -139,7 +114,7 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
             </IconButton>
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={formik.handleSubmit}>
               <Box>
                 <Box
                   sx={{
@@ -157,8 +132,15 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         name="imageUrl"
                         size="small"
                         fullWidth
-                        value={formData.imageUrl}
-                        onChange={handleChange}
+                        value={formik.values.imageUrl}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.imageUrl &&
+                          Boolean(formik.errors.imageUrl)
+                        }
+                        helperText={
+                          formik.touched.imageUrl && formik.errors.imageUrl
+                        }
                       />
                     </Grid>
                     <Grid item xs={6}>
@@ -169,8 +151,15 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         name="firstName"
                         size="small"
                         fullWidth
-                        value={formData.firstName}
-                        onChange={handleChange}
+                        value={formik.values.firstName}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.firstName &&
+                          Boolean(formik.errors.firstName)
+                        }
+                        helperText={
+                          formik.touched.firstName && formik.errors.firstName
+                        }
                       />
                     </Grid>
                     <Grid item xs={6}>
@@ -181,8 +170,15 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         name="lastName"
                         size="small"
                         fullWidth
-                        value={formData.lastName}
-                        onChange={handleChange}
+                        value={formik.values.lastName}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.lastName &&
+                          Boolean(formik.errors.lastName)
+                        }
+                        helperText={
+                          formik.touched.lastName && formik.errors.lastName
+                        }
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -191,8 +187,12 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         name="email"
                         size="small"
                         fullWidth
-                        value={formData.email}
-                        onChange={handleChange}
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.email && Boolean(formik.errors.email)
+                        }
+                        helperText={formik.touched.email && formik.errors.email}
                       />
                     </Grid>
 
@@ -207,8 +207,16 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
                         fullWidth
                         multiline
                         rows={4}
-                        value={formData.description}
-                        onChange={handleChange}
+                        value={formik.values.description}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.description &&
+                          Boolean(formik.errors.description)
+                        }
+                        helperText={
+                          formik.touched.description &&
+                          formik.errors.description
+                        }
                       />
                     </Grid>
                     <Grid item xs={12}>

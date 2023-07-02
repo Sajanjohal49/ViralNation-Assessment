@@ -1,19 +1,10 @@
 import styled from "@emotion/styled";
-import {
-  Avatar,
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, Grid, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import Actions from "./Actions";
 
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { blue, grey } from "@mui/material/colors";
+import { blue } from "@mui/material/colors";
 type Profile = {
   id: string;
   first_name: string;
@@ -43,10 +34,11 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
         sx={{
           borderRadius: "10px",
           padding: 3,
-
+          minHeight: "154px",
           color: "text.primary",
           boxShadow: "none",
           overflow: "hidden",
+
           textOverflow: "ellipsis",
         }}>
         <Box
@@ -61,7 +53,11 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
                 sx={{
                   mx: "auto",
                 }}>
-                <Stack spacing={2} direction="row" alignItems="center">
+                <Stack
+                  spacing={2}
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between">
                   <Avatar
                     alt={profile.image_url}
                     src={profile.image_url}
@@ -70,14 +66,14 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
 
                   <Typography
                     component="div"
-                    noWrap
+                    noWrap //shrinkable
                     sx={{
                       display: "flex",
 
                       flexDirection: "column",
                     }}>
                     <Typography
-                      noWrap
+                      noWrap //shrinkable
                       variant="subtitle2"
                       sx={{
                         textAlign: "left",
@@ -86,6 +82,7 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
                       <VerifiedIcon
                         sx={{
                           color: blue[500],
+                          marginLeft: "5px",
                           width: 20,
                           height: 20,
                           verticalAlign: "middle",
@@ -93,7 +90,7 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
                       />
                     </Typography>
                     <Typography
-                      noWrap
+                      noWrap //shrinkable
                       variant="caption"
                       sx={{
                         textAlign: "left",
@@ -102,14 +99,8 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
                       {profile.email}
                     </Typography>
                   </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      alignItems: "flex-end",
-                    }}>
-                    <Actions profileId={profile.id} />
-                  </Box>
+
+                  <Actions profileId={profile.id} />
                 </Stack>
               </Item>
             </Box>
