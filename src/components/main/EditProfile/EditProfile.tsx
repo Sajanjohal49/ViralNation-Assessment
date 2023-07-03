@@ -44,7 +44,12 @@ const EditProfile: React.FC<EditProfileProps> = ({
   const muiTheme = createTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
   const [formData, setFormData] = useState<Partial<Profile>>({
+    first_name: "", // Initialize with empty string
+    last_name: "", // Initialize with empty string
+    email: "", // Initialize with empty string
     is_verified: false,
+    image_url: "", // Initialize with empty string
+    description: "",
   });
   const [formErrors, setFormErrors] = useState<Partial<Profile>>({});
 
@@ -164,7 +169,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
             <Box sx={{ display: "flex", flexWrap: "wrap" }}>
               <form onSubmit={handleSubmit}>
                 <Box>
-                  <Box sx={{ padding: "30px 60px" }}>
+                  <Box sx={{ padding: isSmallScreen ? "30px" : "30px 60px" }}>
                     <Grid container spacing={2} rowSpacing={3}>
                       <Grid item xs={12}>
                         <InputLabel sx={{ fontSize: "13px" }}>

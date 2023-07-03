@@ -102,7 +102,7 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              padding: "20px 40px  ",
+              padding: isSmallScreen ? "20px" : "30px 60px",
               alignItems: "center",
               height: "30px",
 
@@ -113,12 +113,16 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ open, handleClose }) => {
               <CloseIcon />
             </IconButton>
           </Box>
-          <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+            }}>
             <form onSubmit={formik.handleSubmit}>
               <Box>
                 <Box
                   sx={{
-                    padding: "50px 40px 0px ",
+                    padding: isSmallScreen ? "25px" : "30px 60px",
                     justifyContent: "center",
 
                     alignItems: "center",

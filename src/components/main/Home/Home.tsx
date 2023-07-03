@@ -1,6 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
-import MainHomeComponent from "./MainHomeComponent";
+
+import MainSection from "./MainSection";
 
 const Home = () => {
   // Type annotation for profiles array
@@ -14,7 +15,7 @@ const Home = () => {
 
         color: "text.primary",
       }}>
-      <MainHomeComponent />
+      <MainSection />
     </Box>
   );
 };

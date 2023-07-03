@@ -77,17 +77,20 @@ const ProfileGridItem: React.FC<ProfileGridItemProps> = ({ profile }) => {
                       variant="subtitle2"
                       sx={{
                         textAlign: "left",
+                        textTransform: "capitalize",
                       }}>
-                      {profile.first_name} {profile.last_name}
-                      <VerifiedIcon
-                        sx={{
-                          color: blue[500],
-                          marginLeft: "5px",
-                          width: 20,
-                          height: 20,
-                          verticalAlign: "middle",
-                        }}
-                      />
+                      {profile.first_name} {profile.last_name}{" "}
+                      {profile.is_verified && (
+                        <VerifiedIcon
+                          sx={{
+                            color: blue[500],
+                            marginLeft: "5px",
+                            width: 20,
+                            height: 20,
+                            verticalAlign: "middle",
+                          }}
+                        />
+                      )}
                     </Typography>
                     <Typography
                       noWrap //shrinkable

@@ -20,7 +20,7 @@ type Profile = {
   description: string;
 };
 
-const Test = () => {
+const MainSection = () => {
   const [searchString, setSearchString] = useState("");
   const [profiles, setProfiles] = useState<Profile[]>([]);
 
@@ -209,4 +209,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default MainSection;
