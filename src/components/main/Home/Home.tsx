@@ -1,8 +1,8 @@
 import React from "react";
 import { Box } from "@mui/material";
-import Test from "./CardView/Test";
+import MainHomeComponent from "./MainHomeComponent";
 
-const Homepage = () => {
+const Home = () => {
   // Type annotation for profiles array
 
   return (
@@ -14,10 +14,9 @@ const Homepage = () => {
 
         color: "text.primary",
       }}>
-      {/* <CardView /> */}
-      <Test />
+      <MainHomeComponent />
     </Box>
   );
 };
 
-export default Homepage;
+export default Home;

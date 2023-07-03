@@ -17,8 +17,8 @@ import {
 import { useLazyQuery, useMutation } from "@apollo/client";
 
 import CloseIcon from "@mui/icons-material/Close";
-import { GET_PROFILE_DETAILS } from "../../queries/getProfileDetails";
 import { UPDATE_PROFILE } from "../../queries/editProfiles";
+import { GET_PROFILE_DETAILS } from "../../queries/getProfileDetails";
 
 type Profile = {
   id: string;
@@ -43,7 +43,9 @@ const EditProfile: React.FC<EditProfileProps> = ({
 }) => {
   const muiTheme = createTheme();
   const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
-  const [formData, setFormData] = useState<Partial<Profile>>({});
+  const [formData, setFormData] = useState<Partial<Profile>>({
+    is_verified: false,
+  });
   const [formErrors, setFormErrors] = useState<Partial<Profile>>({});
 
   const [fetchProfileDetails] = useLazyQuery(GET_PROFILE_DETAILS, {

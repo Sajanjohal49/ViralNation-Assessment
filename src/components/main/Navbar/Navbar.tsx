@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, Switch, Box } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { ColorModeContext } from "../hook/DarkModeContext";
+import { ColorModeContext } from "../../hooks/DarkModeContext";
 import { useTheme } from "@emotion/react";
 
 export const Navbar: React.FC = () => {
@@ -53,7 +53,11 @@ export const Navbar: React.FC = () => {
             }}>
             <LightModeIcon fontSize="small" />
 
-            <Switch color="default" onClick={colorMode.toggleColorMode} />
+            <Switch
+              color="default"
+              onClick={colorMode.toggleColorMode}
+              sx={{ margin: "0px 10px" }}
+            />
             <DarkModeIcon fontSize="small" />
           </div>
         </Toolbar>
