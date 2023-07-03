@@ -1,6 +1,6 @@
 # Viral Nation Assessment
 
-Thanks Viral Nation for giving me the opportunity to represent my skills through this application.
+Thanks, Viral Nation for giving me the opportunity to represent my skills through this application.
 
 ## Stack Used
 
@@ -29,7 +29,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd ViralNation-Assessment
 ```
 
 Install dependencies
