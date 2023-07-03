@@ -23,7 +23,7 @@ Thanks, Viral Nation for giving me the opportunity to represent my skills throug
 Clone the project
 
 ```bash
-  git clone https://link-to-project](https://github.com/Sajanjohal49/ViralNation-Assessment.git
+  git clone https://github.com/Sajanjohal49/ViralNation-Assessment.git
 ```
 
 Go to the project directory
